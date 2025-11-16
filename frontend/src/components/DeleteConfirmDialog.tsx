@@ -7,12 +7,19 @@ import {
   Typography,
 } from "@mui/material";
 
+interface DeleteConfirmDialogProps {
+  open: boolean;
+  onClose: () => void;
+  target: { _id: string; name: string } | null;
+  onConfirm: (id: string) => void;
+}
+
 export default function DeleteConfirmDialog({
   open,
   onClose,
   target,
   onConfirm,
-}) {
+}: DeleteConfirmDialogProps) {
   if (!target) return null;
 
   return (
