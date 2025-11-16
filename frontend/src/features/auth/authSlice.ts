@@ -1,3 +1,4 @@
+
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import api from '../../api/api';
 
@@ -13,17 +14,19 @@ const initialState: AuthState = {
   error: null,
 };
 
-export const login = createAsyncThunk(
-  'auth/login',
-  async (payload: { email: string; password: string }, { rejectWithValue }) => {
-    try {
-      const res = await api.post('/auth/login', payload);
-      return res.data.access_token as string;
-    } catch (err: any) {
-      return rejectWithValue(err.response?.data?.message ?? 'Login failed');
-    }
+export const login = createAsyncThunk<
+  string, 
+  { email: string; password: string }, 
+  { rejectValue: string } 
+>('auth/login', async (payload, { rejectWithValue }) => {
+  try {
+    const res = await api.post<{ access_token: string }>('/auth/login', payload);
+    return res.data.access_token;
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Login failed';
+    return rejectWithValue(message);
   }
-);
+});
 
 const authSlice = createSlice({
   name: 'auth',
@@ -36,7 +39,10 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(login.pending, (s) => { s.loading = true; s.error = null; })
+      .addCase(login.pending, (s) => {
+        s.loading = true;
+        s.error = null;
+      })
       .addCase(login.fulfilled, (s, action) => {
         s.loading = false;
         s.token = action.payload;
@@ -44,7 +50,7 @@ const authSlice = createSlice({
       })
       .addCase(login.rejected, (s, action) => {
         s.loading = false;
-        s.error = action.payload as string;
+        s.error = action.payload ?? 'Login failed';
       });
   },
 });

@@ -186,13 +186,17 @@ export class MonitoringPointsService {
     const skip = (page - 1) * limit;
     const sort: Record<string, 1 | -1> = { [sortBy]: order === 'asc' ? 1 : -1 };
 
+    // Garantir que limit seja no máximo 100 para evitar sobrecarga
+    const safeLimit = Math.min(limit, 100);
+    const safePage = Math.max(1, page);
+
     const [items, total] = await Promise.all([
       this.mpModel
         .find()
         .populate('machine')
         .sort(sort)
         .skip(skip)
-        .limit(limit)
+        .limit(safeLimit)
         .exec(),
       this.mpModel.countDocuments().exec(),
     ]);

@@ -1,3 +1,4 @@
+
 export type Machine = {
   _id: string;
   name: string;

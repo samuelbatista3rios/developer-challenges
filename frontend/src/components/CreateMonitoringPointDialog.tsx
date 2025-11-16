@@ -9,9 +9,14 @@ import {
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { createMonitoringPoint } from "../features/monitoring/monitoringSlice";
-import type { AppDispatch } from "../store";
+import type { AppDispatch } from "../app/store";
 
-export default function CreateMonitoringPointDialog({ open, onClose }) {
+interface CreateMonitoringPointDialogProps {
+  open: boolean;
+  onClose: () => void;
+}
+
+export default function CreateMonitoringPointDialog({ open, onClose }: CreateMonitoringPointDialogProps) {
   const dispatch = useDispatch<AppDispatch>();
 
   const [name, setName] = useState("");

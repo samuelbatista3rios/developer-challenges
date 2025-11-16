@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import {
   Dialog,
   DialogTitle,
@@ -9,13 +10,22 @@ import {
 import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { updateMonitoringPoint } from "../features/monitoring/monitoringSlice";
-import type { AppDispatch } from "../store";
+import type { AppDispatch } from "../app/store";
+import type { MonitoringPoint } from "../types";
+
+interface EditMonitoringPointDialogProps {
+  open: boolean;
+  onClose: () => void;
+  monitoringPoint: MonitoringPoint | null;
+  onSuccess?: () => void;
+}
 
 export default function EditMonitoringPointDialog({
   open,
   onClose,
   monitoringPoint,
-}) {
+  onSuccess,
+}: EditMonitoringPointDialogProps) {
   const dispatch = useDispatch<AppDispatch>();
 
   const [name, setName] = useState("");
@@ -24,9 +34,28 @@ export default function EditMonitoringPointDialog({
   useEffect(() => {
     if (monitoringPoint) {
       setName(monitoringPoint.name);
-      setMachineId(monitoringPoint.machineId);
+      const machineIdValue = typeof monitoringPoint.machine === 'string' 
+        ? monitoringPoint.machine 
+        : monitoringPoint.machine?._id || '';
+      setMachineId(machineIdValue);
     }
   }, [monitoringPoint]);
+
+  const handleSave = () => {
+    if (!monitoringPoint) return;
+
+    dispatch(
+      updateMonitoringPoint({
+        id: monitoringPoint._id,
+        data: { name, machineId },
+      })
+    );
+    
+    onClose();
+    if (onSuccess) {
+      onSuccess();
+    }
+  };
 
   if (!monitoringPoint) return null;
 
@@ -53,15 +82,7 @@ export default function EditMonitoringPointDialog({
 
         <Button
           variant="contained"
-          onClick={() => {
-            dispatch(
-              updateMonitoringPoint({
-                id: monitoringPoint._id,
-                data: { name, machineId },
-              })
-            );
-            onClose();
-          }}
+          onClick={handleSave}
         >
           Salvar
         </Button>

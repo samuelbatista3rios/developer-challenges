@@ -47,14 +47,20 @@ export class MonitoringPointsController {
     @Query('sortBy') sortBy?: string,
     @Query('order') order?: 'asc' | 'desc',
   ) {
-    const p = Number(page ?? 1);
-    const l = Number(limit ?? 5);
+    const p = Math.max(1, Number(page ?? 1));
+    const l = Math.max(1, Number(limit ?? 5));
     const { items, total } = await this.mpService.findAll(
       p,
       l,
       sortBy ?? 'name',
       order ?? 'asc',
     );
-    return { items, total, page: p, limit: l };
+    
+    return {
+      data: items,
+      page: p,
+      limit: l,
+      total
+    };
   }
 }
