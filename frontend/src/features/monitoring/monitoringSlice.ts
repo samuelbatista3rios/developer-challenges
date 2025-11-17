@@ -34,7 +34,7 @@ type UpdateMonitoringPointData = {
   sensorModel?: 'TcAg' | 'TcAs' | 'HF+' | null;
 };
 
-// Carregar estado do localStorage
+
 const loadStateFromStorage = (): State => {
   try {
     const serializedState = localStorage.getItem('monitoringState');
@@ -49,7 +49,7 @@ const loadStateFromStorage = (): State => {
       };
     }
     const state = JSON.parse(serializedState);
-    // Garantir que o limit seja 5 mesmo se estiver salvo diferente
+   
     return {
       ...state,
       limit: 5
@@ -67,7 +67,7 @@ const loadStateFromStorage = (): State => {
   }
 };
 
-// Salvar estado no localStorage
+
 const saveStateToStorage = (state: State) => {
   try {
     const serializedState = JSON.stringify(state);
@@ -91,7 +91,7 @@ export const fetchMonitoringPoints = createAsyncThunk<FetchResult, FetchParams, 
         total: number;
       }>('/monitoring-points', { params });
       
-      console.log('✅ Monitoring points fetched successfully:', {
+      console.log('Monitoring points fetched successfully:', {
         count: res.data.data.length,
         page: res.data.page,
         total: res.data.total
@@ -119,7 +119,7 @@ export const deleteMonitoringPoint = createAsyncThunk<
   try {
     console.log('🗑️ Attempting to delete monitoring point:', id);
     const response = await api.delete(`/monitoring-points/${id}`);
-    console.log('✅ Monitoring point deleted successfully from backend:', id);
+    console.log('Monitoring point deleted successfully from backend:', id);
     return id;
   } catch (err: unknown) {
     console.error('❌ Error deleting monitoring point from backend:', err);
@@ -136,7 +136,7 @@ export const updateMonitoringPoint = createAsyncThunk<
   try {
     console.log('🔄 Updating monitoring point:', { id, data });
     const res = await api.patch<MonitoringPoint>(`/monitoring-points/${id}`, data);
-    console.log('✅ Monitoring point updated successfully:', res.data);
+    console.log('Monitoring point updated successfully:', res.data);
     return res.data;
   } catch (err: unknown) {
     console.error('❌ Error updating monitoring point:', err);
@@ -153,7 +153,7 @@ export const createMonitoringPoint = createAsyncThunk<
   try {
     console.log('🔄 Creating monitoring point:', payload);
     const res = await api.post<MonitoringPoint>('/monitoring-points', payload);
-    console.log('✅ Monitoring point created successfully:', res.data);
+    console.log('Monitoring point created successfully:', res.data);
     return res.data;
   } catch (err: unknown) {
     console.error('❌ Error creating monitoring point:', err);
@@ -170,7 +170,7 @@ export const assignSensor = createAsyncThunk<
   try {
     console.log('🔄 Assigning sensor:', payload);
     const res = await api.post<MonitoringPoint>('/monitoring-points/assign-sensor', payload);
-    console.log('✅ Sensor assigned successfully:', res.data);
+    console.log('Sensor assigned successfully:', res.data);
     return res.data;
   } catch (err: unknown) {
     console.error('❌ Error assigning sensor:', err);
@@ -198,7 +198,7 @@ const slice = createSlice({
       state.lastUpdate = new Date().toISOString();
       saveStateToStorage(state);
     },
-    // Adicionar ponto localmente com persistência
+   
     addMonitoringPointLocally(state, action: PayloadAction<MonitoringPoint>) {
       if (!Array.isArray(state.items)) {
         state.items = [];
@@ -207,13 +207,13 @@ const slice = createSlice({
       state.total = (state.total || 0) + 1;
       state.lastUpdate = new Date().toISOString();
       saveStateToStorage(state);
-      console.log('✅ Monitoring point added locally:', action.payload._id);
+      console.log('Monitoring point added locally:', action.payload._id);
     },
-    // Sincronizar com backend
+    
     syncWithBackend(state) {
       state.loading = true;
     },
-    // Limpar storage (para debug)
+    
     clearStorage(state) {
       state.items = [];
       state.page = 1;
@@ -225,7 +225,7 @@ const slice = createSlice({
       localStorage.removeItem('monitoringState');
       console.log('🗑️ Storage cleared');
     },
-    // Forçar refresh dos dados
+    
     forceRefresh(state) {
       state.loading = true;
       state.lastUpdate = new Date().toISOString();
@@ -233,7 +233,7 @@ const slice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // fetchMonitoringPoints
+      
       .addCase(fetchMonitoringPoints.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -248,7 +248,7 @@ const slice = createSlice({
         state.error = null;
         state.lastUpdate = new Date().toISOString();
         saveStateToStorage(state);
-        console.log('✅ Monitoring points loaded:', {
+        console.log('Monitoring points loaded:', {
           items: state.items.length,
           page: state.page,
           total: state.total
@@ -261,7 +261,7 @@ const slice = createSlice({
         saveStateToStorage(state);
         console.error('❌ Failed to fetch monitoring points:', state.error);
       })
-      // createMonitoringPoint
+     
       .addCase(createMonitoringPoint.pending, (state) => {
         state.error = null;
         console.log('🔄 Creating monitoring point...');
@@ -269,9 +269,9 @@ const slice = createSlice({
       .addCase(createMonitoringPoint.fulfilled, (state, action) => {
         state.error = null;
         state.lastUpdate = new Date().toISOString();
-        // Não adicionamos o item aqui - será adicionado via addMonitoringPointLocally
+     
         saveStateToStorage(state);
-        console.log('✅ Monitoring point creation confirmed:', action.payload._id);
+        console.log('Monitoring point creation confirmed:', action.payload._id);
       })
       .addCase(createMonitoringPoint.rejected, (state, action) => {
         state.error = action.payload ?? action.error.message ?? 'Error creating monitoring point';
@@ -279,7 +279,7 @@ const slice = createSlice({
         saveStateToStorage(state);
         console.error('❌ Failed to create monitoring point:', state.error);
       })
-      // deleteMonitoringPoint
+    
       .addCase(deleteMonitoringPoint.pending, (state) => {
         state.error = null;
         console.log('🔄 Deleting monitoring point...');
@@ -289,7 +289,7 @@ const slice = createSlice({
           const initialLength = state.items.length;
           state.items = state.items.filter((item) => item._id !== action.payload);
           state.total = Math.max(0, (state.total || 1) - 1);
-          console.log('✅ Monitoring point removed from state:', {
+          console.log('Monitoring point removed from state:', {
             removedId: action.payload,
             before: initialLength,
             after: state.items.length
@@ -301,7 +301,7 @@ const slice = createSlice({
         state.error = null;
         state.lastUpdate = new Date().toISOString();
         saveStateToStorage(state);
-        console.log('✅ Monitoring point deletion completed successfully');
+        console.log('Monitoring point deletion completed successfully');
       })
       .addCase(deleteMonitoringPoint.rejected, (state, action) => {
         state.error = action.payload ?? action.error.message ?? 'Error deleting monitoring point';
@@ -309,7 +309,7 @@ const slice = createSlice({
         saveStateToStorage(state);
         console.error('❌ Failed to delete monitoring point:', state.error);
       })
-      // assignSensor
+      
       .addCase(assignSensor.pending, (state) => {
         state.error = null;
         console.log('🔄 Assigning sensor...');
@@ -319,7 +319,7 @@ const slice = createSlice({
           const index = state.items.findIndex((item) => item._id === action.payload._id);
           if (index >= 0) {
             state.items[index] = action.payload;
-            console.log('✅ Sensor assigned successfully to:', action.payload._id);
+            console.log('Sensor assigned successfully to:', action.payload._id);
           }
         }
         state.error = null;
@@ -332,7 +332,7 @@ const slice = createSlice({
         saveStateToStorage(state);
         console.error('❌ Failed to assign sensor:', state.error);
       })
-      // updateMonitoringPoint
+     
       .addCase(updateMonitoringPoint.pending, (state) => {
         state.error = null;
         console.log('🔄 Updating monitoring point...');
@@ -342,7 +342,7 @@ const slice = createSlice({
           const index = state.items.findIndex((item) => item._id === action.payload._id);
           if (index >= 0) {
             state.items[index] = action.payload;
-            console.log('✅ Monitoring point updated successfully:', action.payload._id);
+            console.log('Monitoring point updated successfully:', action.payload._id);
           }
         }
         state.error = null;

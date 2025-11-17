@@ -58,16 +58,16 @@ const MonitoringPointsPage: React.FC = () => {
   const [order, setOrder] = useState<"asc" | "desc">("asc");
   const [showDebug, setShowDebug] = useState(false);
 
-  // edit dialog
+  
   const [editOpen, setEditOpen] = useState<boolean>(false);
   const [editTarget, setEditTarget] = useState<MonitoringPoint | null>(null);
 
-  // assign sensor dialog
+ 
   const [open, setOpen] = useState<boolean>(false);
   const [selectedMp, setSelectedMp] = useState<MonitoringPoint | null>(null);
   const [sensorModel, setSensorModel] = useState<"TcAg" | "TcAs" | "HF+" | "">("");
 
-  // Debug detalhado
+  
   useEffect(() => {
     console.log("🔍 MonitoringPointsPage - Estado atual:", {
       items: items?.length || 0,
@@ -79,7 +79,7 @@ const MonitoringPointsPage: React.FC = () => {
       hasLocalStorage: !!localStorage.getItem('monitoringState')
     });
     
-    // Verificar se há dados no localStorage
+    
     const storedState = localStorage.getItem('monitoringState');
     if (storedState) {
       const parsed = JSON.parse(storedState);
@@ -90,13 +90,13 @@ const MonitoringPointsPage: React.FC = () => {
     }
   }, [items, page, limit, loading, total, lastUpdate]);
 
-  // Carregar dados iniciais
+ 
   useEffect(() => {
     console.log("🔄 Initial fetch of monitoring points");
     dispatch(fetchMonitoringPoints({ page: 1, limit: 5, sortBy: orderBy, order }));
   }, [dispatch]);
 
-  // Carregar dados quando mudar página, ordenação ou limite
+  
   useEffect(() => {
     if (page > 0 && limit > 0) {
       console.log("🔄 Fetching with pagination:", { page, limit, orderBy, order });
@@ -104,7 +104,7 @@ const MonitoringPointsPage: React.FC = () => {
     }
   }, [page, limit, orderBy, order, dispatch]);
 
-  // ensure machines loaded for edit dialog
+  
   const machines = useAppSelector((s) => s.machines.items);
   useEffect(() => {
     if (machines.length === 0) {
@@ -157,11 +157,17 @@ const MonitoringPointsPage: React.FC = () => {
   };
 
   const handleCreateSuccess = (newPoint: MonitoringPoint) => {
-    console.log("✅ Create success - adding point locally:", newPoint);
+   console.log("Create success - refreshing data and going to page 1");
     setCreateOpen(false);
     
-    // Adicionar localmente com persistência
+    
     dispatch(addMonitoringPointLocally(newPoint));
+
+     
+  dispatch(setPage(1));
+  dispatch(fetchMonitoringPoints({ page: 1, limit, sortBy: orderBy, order }));
+
+    
   };
 
   const handleForceRefresh = () => {
@@ -174,10 +180,10 @@ const MonitoringPointsPage: React.FC = () => {
     dispatch(clearStorage());
   };
 
-  // Garantir que items seja sempre um array
+  
   const displayItems = Array.isArray(items) ? items : [];
 
-  // helpers seguros para machine fields
+  
   const machineName = (mp: MonitoringPoint): string => {
     if (!mp.machine) return "—";
     if (typeof mp.machine === "string") return mp.machine;
@@ -334,7 +340,7 @@ const MonitoringPointsPage: React.FC = () => {
         </Table>
       </TableContainer>
 
-      {/* Assign Sensor Dialog */}
+      
       <Dialog 
         open={open} 
         onClose={() => setOpen(false)}
@@ -364,7 +370,7 @@ const MonitoringPointsPage: React.FC = () => {
         </DialogActions>
       </Dialog>
 
-      {/* Edit Monitoring Point Dialog */}
+      
       <EditMonitoringPointDialog
         open={editOpen}
         onClose={() => setEditOpen(false)}
@@ -374,7 +380,7 @@ const MonitoringPointsPage: React.FC = () => {
         }}
       />
 
-      {/* Create Monitoring Point Dialog */}
+      
       <CreateMonitoringPointDialog
         open={createOpen}
         onClose={() => setCreateOpen(false)}

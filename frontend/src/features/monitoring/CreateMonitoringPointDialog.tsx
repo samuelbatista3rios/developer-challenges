@@ -44,7 +44,7 @@ const CreateMonitoringPointDialog: React.FC<Props> = ({ open, onClose, onSuccess
         machineId: data.machineId 
       })).unwrap();
       
-      console.log("✅ Monitoring point created successfully:", result);
+      console.log("Monitoring point created successfully:", result);
       enqueueSnackbar('Monitoring point criado com sucesso', { variant: 'success' });
       reset();
       onClose();

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
@@ -85,7 +84,6 @@ const App: React.FC = () => (
             </ProtectedRoute>
           } />
 
-         
           <Route path="*" element={
             <ProtectedRoute>
               <Layout>

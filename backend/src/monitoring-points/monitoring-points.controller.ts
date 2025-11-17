@@ -55,12 +55,12 @@ export class MonitoringPointsController {
       sortBy ?? 'name',
       order ?? 'asc',
     );
-    
+
     return {
       data: items,
       page: p,
       limit: l,
-      total
+      total,
     };
   }
 }

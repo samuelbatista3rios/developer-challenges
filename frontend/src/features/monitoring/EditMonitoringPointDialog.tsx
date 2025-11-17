@@ -52,7 +52,7 @@ const EditMonitoringPointDialog: React.FC<Props> = ({ open, onClose, monitoringP
     }
   }, [monitoringPoint, setValue, reset]);
 
-  // front validation: if machine is Pump, block TcAg/TcAs in the UI
+ 
   const selectedMachineId = watch('machineId');
   const selectedMachine = machines.find((m) => m._id === selectedMachineId);
   const isPump = selectedMachine?.type === 'Pump';

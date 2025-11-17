@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Paper,
@@ -15,18 +15,18 @@ import {
   IconButton,
   CircularProgress,
   Alert,
-} from '@mui/material';
-import { Edit, Delete } from '@mui/icons-material';
-import { useAppDispatch, useAppSelector } from '../app/hooks';
-import { 
-  fetchMonitoringPoints, 
+} from "@mui/material";
+import { Edit, Delete } from "@mui/icons-material";
+import { useAppDispatch, useAppSelector } from "../app/hooks";
+import {
+  fetchMonitoringPoints,
   deleteMonitoringPoint,
-  addMonitoringPointLocally 
-} from '../features/monitoring/monitoringSlice';
-import CreateMonitoringPointDialog from '../features/monitoring/CreateMonitoringPointDialog';
-import EditMonitoringPointDialog from '../features/monitoring/EditMonitoringPointDialog';
-import ConfirmDialog from './ConfirmDialog';
-import { MonitoringPoint } from '../types';
+  addMonitoringPointLocally,
+} from "../features/monitoring/monitoringSlice";
+import CreateMonitoringPointDialog from "../features/monitoring/CreateMonitoringPointDialog";
+import EditMonitoringPointDialog from "../features/monitoring/EditMonitoringPointDialog";
+import ConfirmDialog from "./ConfirmDialog";
+import { MonitoringPoint } from "../types";
 
 const MonitoringPointManagement: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -34,11 +34,15 @@ const MonitoringPointManagement: React.FC = () => {
   const [createDialogOpen, setCreateDialogOpen] = useState<boolean>(false);
   const [editDialogOpen, setEditDialogOpen] = useState<boolean>(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
-  const [selectedPoint, setSelectedPoint] = useState<MonitoringPoint | null>(null);
+  const [selectedPoint, setSelectedPoint] = useState<MonitoringPoint | null>(
+    null
+  );
   const [error, setError] = useState<string | null>(null);
 
-  // Garantir que items seja sempre um array
-  const items = Array.isArray(monitoringState.items) ? monitoringState.items : [];
+
+  const items = Array.isArray(monitoringState.items)
+    ? monitoringState.items
+    : [];
 
   useEffect(() => {
     console.log("🔄 Carregando pontos de monitoramento...");
@@ -63,44 +67,45 @@ const MonitoringPointManagement: React.FC = () => {
         setDeleteDialogOpen(false);
         setSelectedPoint(null);
         setError(null);
-        
-        // Recarregar os dados para garantir sincronização
+
         dispatch(fetchMonitoringPoints({}));
       } catch (err: any) {
         console.error("❌ Erro ao excluir:", err);
-        setError(err.message || 'Erro ao excluir ponto de monitoramento');
+        setError(err.message || "Erro ao excluir ponto de monitoramento");
       }
     }
   };
 
   const handleCreateSuccess = (newPoint: MonitoringPoint) => {
-    console.log("✅ Ponto criado com sucesso:", newPoint);
+    console.log("Ponto criado com sucesso:", newPoint);
     setCreateDialogOpen(false);
-    // Adicionar localmente e recarregar dados
+   
     dispatch(addMonitoringPointLocally(newPoint));
     dispatch(fetchMonitoringPoints({}));
   };
 
-  const getMachineName = (machine: MonitoringPoint['machine']): string => {
-    if (typeof machine === 'string') return machine;
-    return machine?.name || 'Unknown';
+  const getMachineName = (machine: MonitoringPoint["machine"]): string => {
+    if (typeof machine === "string") return machine;
+    return machine?.name || "Unknown";
   };
 
-  const getMachineType = (machine: MonitoringPoint['machine']): string => {
-    if (typeof machine === 'string') return 'Unknown';
-    return machine?.type || 'Unknown';
+  const getMachineType = (machine: MonitoringPoint["machine"]): string => {
+    if (typeof machine === "string") return "Unknown";
+    return machine?.type || "Unknown";
   };
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4">
-          Monitoring Point Management
-        </Typography>
-        <Button
-          variant="contained"
-          onClick={() => setCreateDialogOpen(true)}
-        >
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 3,
+        }}
+      >
+        <Typography variant="h4">Monitoring Point Management</Typography>
+        <Button variant="contained" onClick={() => setCreateDialogOpen(true)}>
           Create Monitoring Point
         </Button>
       </Box>
@@ -127,7 +132,9 @@ const MonitoringPointManagement: React.FC = () => {
               <TableRow>
                 <TableCell colSpan={5} align="center">
                   <CircularProgress />
-                  <Typography variant="body2" sx={{ mt: 1 }}>Carregando...</Typography>
+                  <Typography variant="body2" sx={{ mt: 1 }}>
+                    Carregando...
+                  </Typography>
                 </TableCell>
               </TableRow>
             ) : items.length === 0 ? (
@@ -149,7 +156,7 @@ const MonitoringPointManagement: React.FC = () => {
                   </TableCell>
                   <TableCell>{getMachineName(point.machine)}</TableCell>
                   <TableCell>{getMachineType(point.machine)}</TableCell>
-                  <TableCell>{point.sensorModel || 'Not assigned'}</TableCell>
+                  <TableCell>{point.sensorModel || "Not assigned"}</TableCell>
                   <TableCell>
                     <IconButton
                       size="small"
